@@ -1,12 +1,28 @@
-lucee:
-  build: .
-  environment:
-    - "VIRTUAL_HOST=lucee.*"
-  volumes:
-    - /workbench/lucee-docker-workbench/config/lucee/lucee-server.xml:/opt/lucee/server/lucee-server/context/lucee-server.xml
-    - /workbench/lucee-docker-workbench/config/lucee/lucee-web.xml.cfm:/opt/lucee/web/lucee-web.xml.cfm
-    - /workbench/lucee-docker-workbench/code:/var/www/farcry
-    - /workbench/lucee-docker-workbench/logs/lucee:/opt/lucee/web/logs
-    - /workbench/lucee-docker-workbench/logs/nginx:/var/log/nginx
-    - /workbench/lucee-docker-workbench/logs/supervisor:/var/log/supervisor
-    - /workbench/lucee-docker-workbench/logs/tomcat:/usr/local/tomcat/logs
+version: '2'
+services:
+  web:
+    build: ./web
+    image: chippinkston/lucee:latest
+    environment:
+     - "VIRTUAL_HOST=lucee.*"
+    ports:
+     - "80:80"
+    volumes:
+      - ./web/config/lucee/lucee-server.xml:/opt/lucee/server/lucee-server/context/lucee-server.xml
+      - ./web/config/lucee/lucee-web.xml.cfm:/opt/lucee/web/lucee-web.xml.cfm
+      - ./web/code:/var/www/
+      - ./web/logs/lucee:/opt/lucee/web/logs
+      - ./web/logs/nginx:/var/log/nginx
+      - ./web/logs/supervisor:/var/log/supervisor
+      - ./web/logs/tomcat:/usr/local/tomcat/logs
+    links:
+      - db
+  db:
+    image: mariadb:10.1
+    ports:
+      - "3306:3306"
+    volumes:
+      - /var/lib/mysql
+    environment:
+     MYSQL_ROOT_PASSWORD : stackdb
+     MYSQL_DATABASE : stackdb
